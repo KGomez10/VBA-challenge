@@ -1,0 +1,104 @@
+Sub Stock_Ticker_Analysis()
+
+'__________________________________________________________________________
+' This section is where we create where we will alocate the data
+
+Dim Data_Row As Long
+Dim Out_Put As Long
+Dim Percentage As Long
+Dim RowNum As Long
+Dim PageNum As Long
+Dim GreatestIncrease As Long
+Dim GreatestDecrease As Long
+Dim GreatestVolume As Long
+
+
+For PageNum = 1 To Worksheets.Count
+    Dim ws As Worksheet
+    Set ws = Worksheets(PageNum)
+    Out_Put = 2
+'____________________________________________________________________________
+'This section is where we add headers to the report
+
+    'Ticker, Yearly,Percent Change and Total Stock Vol Headers
+    ws.Range("I1").Value = "Ticker"
+    ws.Range("J1").Value = "Yearly Change"
+    ws.Range("K1").Value = "Percent Change"
+    ws.Range("L1").Value = "Total Stock Volume"
+    
+  
+'Total Stock Volume Counter
+Dim OpenPrice As Double
+Dim Total_Stock_Volume As Double
+Dim ClosePrice As Double
+ 
+    OpenPrice = ws.Range("C2").Value
+' Commensing looping on fist row and column
+For Data_Row = 2 To ws.Range("A2").End(xlDown).Row
+        If ws.Cells(Data_Row, 1).Value <> ws.Cells(Data_Row + 1, 1).Value Then
+   
+        ' Adjoining Volume to the Total Stock Volume
+        Total_Stock_Volume = (Total_Stock_Volume + ws.Cells(Data_Row, 7).Value)
+    
+        ' Total Close numbers
+        ClosePrice = ws.Cells(Data_Row, 6).Value
+ 
+        'Add percentage to the numbers
+        If OpenPrice = 0 Then
+            ws.Cells(Out_Put, 11).Value = "NaN"
+        Else
+            ws.Cells(Out_Put, 11).Value = (ClosePrice - OpenPrice) / OpenPrice
+            ws.Cells(Out_Put, 11).Value = Format(ws.Cells(Out_Put, 11).Value, "#.##%")
+    
+        End If
+            'Yearly Change
+            ws.Cells(Out_Put, 10).Value = ClosePrice - OpenPrice
+        
+        If OpenPrice > ClosePrice Then
+            ws.Cells(Out_Put, 10).Interior.ColorIndex = 3
+        Else
+            ws.Cells(Out_Put, 10).Interior.ColorIndex = 4
+        End If
+
+            'Total Stock Volume
+            ws.Cells(Out_Put, 12).Value = Total_Stock_Volume
+
+            'Yearly Change
+            ws.Cells(Out_Put, 10).Value = ClosePrice - OpenPrice
+'________________________________________________________________________________________
+' This section code is to add color to the data
+
+
+        If OpenPrice > ClosePrice Then
+            ws.Cells(Out_Put, 10).Interior.ColorIndex = 3
+        Else
+            ws.Cells(Out_Put, 10).Interior.ColorIndex = 4
+        End If
+
+            'Total Stock Volume
+            ws.Cells(Out_Put, 12).Value = Total_Stock_Volume
+
+            'TickerF
+            ws.Cells(Out_Put, 9).Value = ws.Cells(Data_Row, 1).Value
+
+            ' Add 1 to the row counter for the output table
+            Out_Put = Out_Put + 1
+            
+            ' Then update the new open price to be the open price of the next row
+            Total_Stock_Volume = 0
+            OpenPrice = ws.Cells(Data_Row + 1, 3).Value
+                
+        Else
+            
+            'Add total stock volume' counter
+            Total_Stock_Volume = (Total_Stock_Volume + ws.Cells(Data_Row, 8).Value)
+
+
+        End If
+    Next Data_Row
+    
+Next PageNum
+
+End Sub
+
+
